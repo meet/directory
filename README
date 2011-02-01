@@ -1,0 +1,27 @@
+Directory
+=========
+
+A library for simple LDAP ORM.
+
+Add the following to your Gemfile:
+
+  gem 'directory', '0.0.1', :git => 'git://github.com/meet/directory.git'
+
+Then (e.g. in a Rails initializer) specify connection parameters:
+
+  Directory.connect_with :base => 'dc=example,dc=com', :auth => { ... }, ...
+
+
+Testing
+=======
+
+Use a mock LDAP backend:
+
+  require 'directory/test_help'
+  Directory.backend = Directory::MockLDAP
+
+Then use e.g.:
+
+  Directory.connection.mock_user(:uid => ..., ...)
+
+And so on.
