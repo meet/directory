@@ -5,9 +5,15 @@ module Directory
   @@connection = nil
   @@connection_params = { }
   
+  # Get the backend used for new connections.
+  def self.backend
+    @@backend
+  end
+  
   # Set the backend, which defaults to Net::LDAP. See MockLDAP.
   def self.backend=(backend)
     @@backend = backend
+    @@connection = nil
   end
   
   # Add connection parameters. Discards any current connection.
