@@ -30,6 +30,11 @@ module Directory
       mock_entry("cn=#{args[:cn]},ou=groups,#{@args[:base]}", args)
     end
     
+    # Add a mock app.
+    def mock_app(args)
+      mock_entry("ou=#{args[:ou]},ou=apps,#{@args[:base]}", args)
+    end
+    
     # Remove all mock entries.
     def clear_mocks
       @@bind_mocks.clear
