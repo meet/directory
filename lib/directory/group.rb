@@ -3,6 +3,11 @@ module Directory
   # Represents a group of users.
   class Group
     
+    # Represents an email address group member.
+    class Mail < Struct.new(:mail)
+      def name() mail end
+    end
+    
     # Find all groups.
     def self.all
       return Directory.connection.all_groups.map { |entry| new(entry) }
@@ -17,9 +22,11 @@ module Directory
     end
     
     def self.find_by_mail(mail)
-      # BUG: mail address is not necessarily the common name
-      Directory.connection.find_group_by_cn(mail.split('@')[0]) do |entry|
-        return new(entry)
+      name, domain = mail.split('@')
+      if domain == Directory.connection.base.split(/,?dc=/)[1..-1].join('.')
+        Directory.connection.find_group_by_cn(name) do |entry|
+          return new(entry)
+        end
       end
       return false
     end
@@ -47,7 +54,11 @@ module Directory
     end
     
     def members
-      @members ||= @member_uids.map { |uid| User.find(uid) || Group.find_by_mail(uid) }
+      @members ||= @member_uids.map { |id| User.find(id) || Group.find_by_mail(id) || Mail.new(id) }
+    end
+    
+    def mail
+      "#{groupname}@#{dn.split(',dc=')[1..-1].join('.')}"
     end
     
     # ActiveRecord methods
