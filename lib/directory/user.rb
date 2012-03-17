@@ -33,6 +33,7 @@ module Directory
       @mail_aliases = entry[:meetalias]
       @enabled = entry[:shadowexpire].empty?
       @groups = nil
+      @passworded = nil
     end
     
     def enabled=(enabled)
@@ -54,6 +55,11 @@ module Directory
     def mail_forward=(mail_forward)
       Directory.connection.replace_attribute(dn, :mail, mail_forward)
       reinitialize!
+    end
+    
+    def passworded
+      @passworded = ! Directory.connection.find_by_dn_with_attr(dn, :userpassword).empty? if @passworded.nil?
+      @passworded
     end
     
     # Set a new password by hashing the given plaintext.

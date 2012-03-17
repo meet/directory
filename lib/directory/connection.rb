@@ -38,6 +38,12 @@ module Directory
       search(:base => dn, :scope => Net::LDAP::SearchScope_BaseObject, &block)
     end
     
+    def find_by_dn_with_attr(dn, attribute, &block)
+      search(:base => dn,
+             :filter => Net::LDAP::Filter.pres(attribute), :scope => Net::LDAP::SearchScope_BaseObject,
+             &block)
+    end
+    
     def all_users(&block)
       search(:base => "ou=users,#{base}", :filter => Net::LDAP::Filter.pres('uid'), &block)
     end

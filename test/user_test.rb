@@ -51,4 +51,14 @@ class UserTest < Test::Unit::TestCase
     assert_equal Digest::SHA1.digest('super_secret'+salt)+salt, hash
   end
   
+  def test_passworded
+    Directory.connection.mock_user(:uid => 'user1')
+    assert ! Directory::User.find('user1').passworded
+    
+    Directory.connection.mock_user(:uid => 'user2', :userpassword => 'secret')
+    assert Directory::User.find('user2').passworded
+    
+    assert_equal [], Directory.connection.changes
+  end
+  
 end

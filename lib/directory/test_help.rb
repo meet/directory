@@ -73,11 +73,18 @@ module Directory
             # no mock entries under this search base
             results = []
           elsif operation == :present
-            # retrieve all under search base (BUG: includes entries without the attribute)
+            # retrieve all under search base, filter later
             results = @@base_mocks[args[:base]][:all] || []
           elsif operation == :equalityMatch
             # retrieve by search base and filter
             results = @@base_mocks[args[:base]][args[:filter].to_s] || []
+          end
+        end
+      end
+      if args[:filter]
+        args[:filter].execute do |operation, attribute, value|
+          if operation == :present
+            results.reject! { |result| result[attribute.to_sym].empty? }
           end
         end
       end
