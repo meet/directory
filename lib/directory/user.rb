@@ -49,7 +49,7 @@ module Directory
     end
     
     def mail
-      "#{username}@#{dn.split(',dc=')[1..-1].join('.')}"
+      "#{username}@#{Directory.dn_to_domain(dn)}"
     end
     
     def mail_forward=(mail_forward)

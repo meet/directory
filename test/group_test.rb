@@ -14,6 +14,11 @@ class GroupTest < Test::Unit::TestCase
     Directory.connection.clear_changes
   end
   
+  def test_mail
+    Directory.connection.mock_group(:cn => 'group')
+    assert_equal 'group@example.com', Directory::Group.find('group').mail
+  end
+  
   def test_find
     Directory.connection.mock_group(:cn => 'group')
     dn = 'cn=group,ou=groups,dc=example,dc=com'

@@ -14,6 +14,11 @@ class UserTest < Test::Unit::TestCase
     Directory.connection.clear_changes
   end
   
+  def test_mail
+    Directory.connection.mock_user(:uid => 'user')
+    assert_equal 'user@example.com', Directory::User.find('user').mail
+  end
+  
   def test_set_enabled
     Directory.connection.mock_user(:uid => 'user')
     dn = 'uid=user,ou=users,dc=example,dc=com'

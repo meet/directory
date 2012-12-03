@@ -23,7 +23,7 @@ module Directory
     
     def self.find_by_mail(mail)
       name, domain = mail.split('@')
-      if domain == Directory.connection.base.split(/,?dc=/)[1..-1].join('.')
+      if domain == Directory.connection.base_domain
         Directory.connection.find_group_by_cn(name) do |entry|
           return new(entry)
         end
@@ -58,7 +58,7 @@ module Directory
     end
     
     def mail
-      "#{groupname}@#{dn.split(',dc=')[1..-1].join('.')}"
+      "#{groupname}@#{Directory.dn_to_domain(dn)}"
     end
     
     # ActiveRecord methods

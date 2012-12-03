@@ -32,7 +32,15 @@ module Directory
     @@backend.new(@@connection_params).extend Search
   end
   
+  def self.dn_to_domain(dn)
+    dn.split(/,?dc=/)[1..-1].join('.')
+  end
+  
   module Search
+    
+    def base_domain
+      Directory.dn_to_domain(base)
+    end
     
     def find_by_dn(dn, &block)
       search(:base => dn, :scope => Net::LDAP::SearchScope_BaseObject, &block)
