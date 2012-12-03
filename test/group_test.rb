@@ -2,7 +2,7 @@ require 'test_helper'
 
 require 'directory/test_help'
 
-class UserTest < Test::Unit::TestCase
+class GroupTest < Test::Unit::TestCase
   
   def setup
     Directory.connect_with :base => 'dc=example,dc=com'
