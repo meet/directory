@@ -36,4 +36,12 @@ class MockLDAPTest < Test::Unit::TestCase
                                                            :filter => Net::LDAP::Filter.pres('givenname'))
   end
   
+  def test_mock_bind
+    Directory.connection.mock_bind('jrh', 'yellow')
+    
+    assert ! Directory.new.bind(:username => 'uid=jrh,ou=users,dc=example', :password => 'golden')
+    assert ! Directory.new.bind(:username => 'uid=hartley,ou=users,dc=example', :password => 'yellow')
+    assert Directory.new.bind(:username => 'uid=jrh,ou=users,dc=example', :password => 'yellow')
+  end
+  
 end
