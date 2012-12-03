@@ -84,6 +84,11 @@ module Directory
       return false
     end
     
+    # Return true iff this user is a manager.
+    def manager?
+      groups.find { |g| g.groupname == 'admins' || g.groupname == 'managers' } != nil
+    end
+    
     # ActiveRecord methods
     
     def self.model_name

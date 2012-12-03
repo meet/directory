@@ -14,6 +14,30 @@ class UserTest < Test::Unit::TestCase
     Directory.connection.clear_changes
   end
   
+  def test_privileged
+    Directory.connection.mock_user(:uid => 'user1')
+    Directory.connection.mock_user(:uid => 'user2')
+    Directory.connection.mock_user(:uid => 'user3')
+    
+    Directory.connection.mock_group(:cn => 'group', :memberuid => [ 'user1', 'user2', 'user3' ])
+    Directory.connection.mock_group(:cn => 'managers', :memberuid => 'user2')
+    Directory.connection.mock_group(:cn => 'admins', :memberuid => 'user1')
+    
+    user1, user2, user3 = Directory::User.all
+    
+    assert user1.admin?(user2)
+    assert user1.admin?(user3)
+    assert user1.manager?
+    
+    assert ! user2.admin?(user1)
+    assert user2.admin?(user3)
+    assert user2.manager?
+    
+    assert ! user2.admin?(user1)
+    assert ! user3.admin?(user2)
+    assert ! user3.manager?
+  end
+  
   def test_mail
     Directory.connection.mock_user(:uid => 'user')
     assert_equal 'user@example.com', Directory::User.find('user').mail
