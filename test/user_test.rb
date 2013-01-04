@@ -90,4 +90,12 @@ class UserTest < Test::Unit::TestCase
     assert_equal [], Directory.connection.changes
   end
   
+  def test_next_uidnumber
+    Directory.connection.mock_user(:uid => 'user1')
+    assert_equal 1, Directory.connection.next_user_uidnumber
+    
+    Directory.connection.mock_user(:uid => 'user2', :uidnumber => 42)
+    assert_equal 43, Directory.connection.next_user_uidnumber
+  end
+  
 end

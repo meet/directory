@@ -35,6 +35,11 @@ module Directory
       mock_entry("ou=#{args[:ou]},ou=apps,#{@args[:base]}", args)
     end
     
+    # Add a mock new user.
+    def mock_new_user(args)
+      mock_entry("cn=#{args[:cn]},ou=newusers,#{@args[:base]}", args)
+    end
+    
     # Remove all mock entries.
     def clear_mocks
       @@bind_mocks.clear
@@ -92,6 +97,24 @@ module Directory
         results.each { |result| yield result }
       end
       return results
+    end
+    
+    def add(args)
+      mock_entry(args[:dn], args[:attributes])
+      record_change(args[:dn], :dn, args[:dn])
+      args[:attributes].each do |key, value|
+        record_change(args[:dn], key, value.is_a?(Array) ? value : [ value ])
+      end
+    end
+    
+    def delete(args)
+      @@dn_mocks.delete(args[:dn])
+      @@base_mocks.each do |base, mocks|
+        mocks.each do |filter, entries|
+          entries.delete_if { |entry| entry[:dn] == args[:dn] }
+        end
+      end
+      record_change(args[:dn], :dn, nil)
     end
     
     def add_attribute(dn, attribute, value)

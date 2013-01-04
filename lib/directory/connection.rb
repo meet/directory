@@ -66,6 +66,32 @@ module Directory
              &block)
     end
     
+    def find_users_by_mail(mail, &block)
+      search(:base => "ou=users,#{base}", :filter => Net::LDAP::Filter.eq('mail', "#{mail}"), &block)
+    end
+    
+    def find_user_by_meetalias(mail, &block)
+      search(:base => "ou=users,#{base}", :filter => Net::LDAP::Filter.eq('meetalias', "#{mail}"), &block)
+    end
+    
+    def all_new_users(&block)
+      search(:base => "ou=newusers,#{base}", :filter => Net::LDAP::Filter.pres('cn'), &block)
+    end
+    
+    def find_new_user_by_cn(cn, &block)
+      search(:base => "ou=newusers,#{base}", :filter => Net::LDAP::Filter.eq('cn', "#{cn}"), &block)
+    end
+    
+    def find_new_user_by_mail(mail, &block)
+      search(:base => "ou=newusers,#{base}", :filter => Net::LDAP::Filter.eq('mail', "#{mail}"), &block)
+    end
+    
+    def next_user_uidnumber
+      search(:base => "ou=users,#{base}",
+             :filter => Net::LDAP::Filter.pres('uid'),
+             :attributes => 'uidnumber').map { |entry| entry[:uidnumber].first.to_i } .max + 1
+    end
+    
     def all_groups(&block)
       search(:base => "ou=groups,#{base}", :filter => Net::LDAP::Filter.pres('cn'), &block)
     end
@@ -82,6 +108,10 @@ module Directory
       search(:base => "ou=groups,#{base}",
              :filter => Net::LDAP::Filter.eq('cn', "*#{query}*") | Net::LDAP::Filter.eq('description', "*#{query}*"),
              &block)
+    end
+    
+    def find_group_by_meetalias(mail, &block)
+      search(:base => "ou=groups,#{base}", :filter => Net::LDAP::Filter.eq('meetalias', "#{mail}"), &block)
     end
     
     def find_app_by_url(url, &block)
