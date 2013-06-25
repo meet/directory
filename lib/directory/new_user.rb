@@ -75,6 +75,7 @@ module Directory
           @requester = User.new(user) if user
         end
         @primary_group = entry[:ou].first
+        @username = entry[:uid].first if entry[:uid]
       end
     end
     
@@ -92,7 +93,11 @@ module Directory
     end
     
     def save_errors
-      errors.reject { |attrib, msgs| [ :username, :mail_inbox ].include?(attrib) }
+      my_errors = errors
+      my_errors = my_errors.reject { |attrib, msgs| [ :username ].include?(attrib) } if (username && username.empty?)
+      my_errors = my_errors.reject { |attrib, msgs| [ :mail_inbox ].include?(attrib) } unless mail_inbox.present?
+      #my_errors = my_errors.reject { |attrib, msgs| [ :username, :mail_inbox ].include?(attrib) }
+      my_errors
     end
     
     def valid_to_save?
@@ -105,15 +110,19 @@ module Directory
     
     def save
       @cn = SecureRandom.hex(8)
-      Directory.connection.add(:dn => dn, :attributes => {
-        :objectclass => [ 'top', 'inetOrgPerson' ],
+      attributes = {
+        :objectclass => ['top', 'inetOrgPerson' ],
         :cn => cn,
         :givenname => first_name,
         :sn => last_name,
         :mail => mail_forward,
         :manager => requester.dn,
-        :ou => primary_group
-      }) or raise Net::LDAP::LdapError, Directory.connection.get_operation_result.message
+        :ou => primary_group}
+
+      attributes[:uid] = username if (username && !username.empty?)
+      attributes[:destinationindicator] = mail_inbox ? 'inbox' : nil if (mail_inbox.present?)
+
+      Directory.connection.add(:dn => dn, :attributes => attributes) or raise Net::LDAP::LdapError, Directory.connection.get_operation_result.message
     end
     
     def create

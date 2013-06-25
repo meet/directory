@@ -86,6 +86,10 @@ module Directory
       search(:base => "ou=newusers,#{base}", :filter => Net::LDAP::Filter.eq('mail', "#{mail}"), &block)
     end
     
+    def find_new_user_by_uid(uid, &block)
+      search(:base => "ou=newusers,#{base}", :filter => Net::LDAP::Filter.eq('uid', "#{uid}"), &block)
+    end
+
     def next_user_uidnumber
       search(:base => "ou=users,#{base}",
              :filter => Net::LDAP::Filter.pres('uid'),
