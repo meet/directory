@@ -26,7 +26,7 @@ module Directory
     
     validates_presence_of :requester, :primary_group, :username, :first_name, :last_name, :mail_forward
     validates_length_of :username, :in => 3..31
-    validates_format_of :username, :with => /\A[a-z]+\Z/, :message => 'must be lowercase letters only'
+    validates_format_of :username, :with => /\A[a-z0-9]+\Z/, :message => 'must be lowercase letters only'
     validates_format_of :mail_forward, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
     validates_inclusion_of :mail_inbox, :in => [ true, false ], :message => 'preference required'
     
