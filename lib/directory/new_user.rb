@@ -55,8 +55,10 @@ module Directory
       warnings[:first_name] = 'should be capitalized properly' unless first_name =~ /[[:upper:]][[:lower:]]/
       warnings[:last_name] = 'should be capitalized properly' unless last_name =~ /[[:upper:]][[:lower:]]/
 
-      errors.add(:first_name, 'should not contain whitespace') if first_name =~ /\s/
-      errors.add(:last_name, 'should not contain whitespace') if last_name =~ /\s/
+      errors.add(:first_name, 'should not end in whitespace') if first_name =~ /\s\Z/
+      errors.add(:first_name, 'should not start with whitespace') if first_name =~ /\A\s/
+      errors.add(:last_name, 'should not contain whitespace') if last_name =~ /\s\Z/
+      errors.add(:last_name, 'should not start with whitespace') if last_name =~ /\A\s/
     end
     
     def initialize(attributes = {}, entry = nil)
