@@ -21,7 +21,7 @@ module Directory
       return Directory.connection.find_users_by_match(query).map { |entry| new(entry) }
     end
     
-    attr_reader :dn, :username, :first_name, :last_name, :name, :mail_forward, :mail_aliases, :enabled
+    attr_reader :dn, :username, :first_name, :last_name, :name, :mail_forward, :mail_aliases, :enabled, :mail_destination_inbox
     
     def initialize(entry)
       @dn = entry[:dn].first
@@ -30,6 +30,7 @@ module Directory
       @last_name = entry[:sn].first
       @name = entry[:cn].first || "#{@first_name} #{@last_name}"
       @mail_forward = entry[:mail].first
+      @mail_destination_inbox = entry[:destinationindicator].first == 'inbox'
       @mail_aliases = entry[:meetalias]
       @enabled = entry[:shadowexpire].empty?
       @groups = nil
@@ -54,6 +55,12 @@ module Directory
     
     def mail_forward=(mail_forward)
       Directory.connection.replace_attribute(dn, :mail, mail_forward)
+      reinitialize!
+    end
+    
+    def mail_destination_inbox=(mail_inbox)
+      Directory.connection.delete_attribute(dn, :destinationindicator)
+      Directory.connection.add_attribute(dn, :destinationindicator, "inbox") if mail_inbox
       reinitialize!
     end
     
